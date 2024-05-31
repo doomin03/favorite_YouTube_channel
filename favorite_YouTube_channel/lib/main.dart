@@ -115,7 +115,11 @@ class _HomePageState extends State<HomePage> {
                         ),
                       Column(
                         children: [
+                          if (_searchResult["name"] != null)
+                            Text(_searchResult["name"]),
 
+                          if (_searchResult["fans"] != null)
+                            Text(_searchResult["fans"]), // 텍스트를 빈 문자열로 표시하는 텍스트 위젯
                         ],
                       )
                     ],
