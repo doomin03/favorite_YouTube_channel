@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+
+
 void main() {
   runApp(const MyApp());
 }
@@ -52,9 +54,11 @@ class _HomePageState extends State<HomePage> {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
-        List<String> titles = jsonResponse["title"];
-        List<String> thumbnails = jsonResponse["img"];
-        List<String> urls = jsonResponse["url"];
+
+        // 데이터 유형 확인 후 적절한 캐스팅을 수행합니다.
+        List<String> titles = (jsonResponse["title"] as List).cast<String>();
+        List<String> thumbnails = (jsonResponse["img"] as List).cast<String>();
+        List<String> urls = (jsonResponse["url"] as List).cast<String>();
 
         for (int i = 0; i < titles.length; i++) {
           videoList.add({
@@ -89,6 +93,7 @@ class _HomePageState extends State<HomePage> {
           };
         });
 
+        // 검색 결과가 있을 때만 비디오를 가져오도록 수정
         if (_searchResult["id"] != null) {
           await _performvideos(_searchResult["id"]);
         }
@@ -174,19 +179,29 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   Expanded(
-                    child: ListView.separated(
-                      itemCount: videoList.length,
-                      separatorBuilder: (context, index) => Divider(),
-                      itemBuilder: (context, index) {
-                        Map<String, dynamic> videoData = videoList[index];
-                        return ListTile(
-                          leading: Image.network(videoData["img"] as String),
-                          title: Text(videoData["title"] as String),
-                          onTap: () {
-                            openVideoUrl(videoData);
-                          },
-                        );
-                      },
+                    child: SizedBox(
+                      height: 188.0, // 이미지의 세로 크기
+                      child: ListView.separated(
+                        itemCount: videoList.length,
+                        separatorBuilder: (context, index) => Divider(),
+                        itemBuilder: (context, index) {
+                          Map<String, dynamic> videoData = videoList[index];
+                          return ListTile(
+                            leading: SizedBox(
+                              width: 336.0, // 이미지의 가로 크기
+                              height: 188.0, // 이미지의 세로 크기
+                              child: Image.network(
+                                videoData["thumbnail"] as String,
+                                fit: BoxFit.cover, // 이미지를 꽉 차게 보이도록 설정
+                              ),
+                            ),
+                            title: Text(videoData["title"] as String),
+                            onTap: () {
+                              openVideoUrl(videoData);
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],
