@@ -33,6 +33,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextEditingController _searchController = TextEditingController();
+  String path = "C:/Users/user/Desktop/영상";
+
+
   Map<String, dynamic> _searchResult = {
     "name": null,
     "icon": null,
@@ -76,6 +79,15 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  Future<void> _performdownload(String _url, String path) async {
+    final url = Uri.parse('http://127.0.0.1:5000/youtube/download?url=$_url&path=$path');
+    try {
+      final response = await http.get(url);
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
   Future<void> _performSearch(String query) async {
     final queryEncoded = Uri.encodeComponent(query);
     final url =
@@ -105,9 +117,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void openVideoUrl(Map<String, dynamic> videoData) {
-    String? videoUrl = videoData["url"];
-    print("Opening video URL: $videoUrl");
+  void openVideoUrl(String url) {
+    if (url != null) {
+      _performdownload(url, path); // 다운로드할 비디오 URL과 저장 경로 전달
+    }
   }
 
   @override
@@ -197,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             title: Text(videoData["title"] as String),
                             onTap: () {
-                              openVideoUrl(videoData);
+                              openVideoUrl(videoData["url"]);
                             },
                           );
                         },
